@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+  #PHP Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./.docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - app-network
+
+  #Nginx Service
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - app-network
+
+  #MySQL Service
+  # pgsql:
+  #   image: postgres:13-alpine
+  #   container_name: db
+  #   restart: unless-stopped
+  #   tty: true
+  #   ports:
+  #     - “5432:5432”
+  #   environment:
+  #     PGPASSWORD: '${DB_PASSWORD:-secret}'
+  #     POSTGRES_DB: '${DB_DATABASE}'
+  #     POSTGRES_USER: '${DB_USERNAME}'
+  #     POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+  #   volumes:
+  #     - dbdata:/var/lib/postgresql/data
+  #     - ./mysql/my.cnf:/etc/mysql/my.cnf
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
+  #     retries: 3
+  #     timeout: 5s
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+#Volumes
+# volumes:
+#   dbdata:
+#     driver: local
