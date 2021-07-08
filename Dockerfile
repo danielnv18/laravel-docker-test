@@ -13,7 +13,7 @@ RUN composer install \
     --no-scripts \
     --prefer-dist
 
-FROM php:7.3-fpm-alpine
+FROM php:7.4-fpm-alpine
 
 COPY --from=vendor /tmp/vendor/ /var/www/html/vendor/
 
